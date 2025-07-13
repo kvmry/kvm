@@ -230,16 +230,17 @@ export class TaskService {
   }
 
   async fileToGenerativePart(file: File) {
-    const base64EncodedDataPromise = new Promise((resolve) => {
+    const base64EncodedDataPromise = new Promise<string>((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () =>
-        resolve(JSON.stringify(reader?.result).split(',')[1]);
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1]);
+      };
       reader.readAsDataURL(file);
     });
     const result = await base64EncodedDataPromise;
-    const chew = JSON.stringify(result).slice(1, -3);
     return {
-      inlineData: { data: chew, mimeType: file.type },
+      inlineData: { data: result, mimeType: file.type },
     } as any;
   }
 
